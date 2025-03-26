@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulawayo Property Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            padding-top: 20px;
+        }
+        .dashboard-header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .summary-card {
+            height: 100%;
+        }
+        .status-badge {
+            font-size: 0.9rem;
+            padding: 5px 10px;
+        }
+        .btn-status {
+            width: 100px;
+        }
+        #soldDateGroup {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark rounded mb-4">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">Bulawayo Property Tracker</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#addPropertyModal">
+                                <i class="bi bi-plus-circle"></i> Add Property
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Summary Cards -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card text-white bg-primary summary-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Properties For Sale</h5>
+                        <h2 id="for-sale-count" class="card-text">0</h2>
+                        <p class="card-text">Currently Available</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-success summary-card">
+                    <div class="card-body">
+                        <h5 class="card-title">New Listings</h5>
+                        <h2 id="new-listings" class="card-text">0</h2>
+                        <p class="card-text">Last 7 Days</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning summary-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Recently Sold</h5>
+                        <h2 id="recently-sold" class="card-text">0</h2>
+                        <p class="card-text">Last 30 Days</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-info summary-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Properties</h5>
+                        <h2 id="total-properties" class="card-text">0</h2>
+                        <p class="card-text">In System</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row mt-4">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5>Monthly Sales Trend</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5>Property Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Property Table -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                        <h5>Property Listings</h5>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPropertyModal">
+                            <i class="bi bi-plus-lg"></i> Add New Property
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Location</th>
+                                        <th>Type</th>
+                                        <th>Price</th>
+                                        <th>Date Listed</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                        <th>Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sales-table">
+                                    <!-- Data will be inserted here by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Property Modal -->
+    <div class="modal fade" id="addPropertyModal" tabindex="-1" aria-labelledby="addPropertyModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="addPropertyModalLabel">Add New Property</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="propertyForm">
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="location" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Property Type</label>
+                            <select class="form-select" id="type" required>
+                                <option value="">Select type</option>
+                                <option value="1-bedroom">1 Bedroom</option>
+                                <option value="2-bedroom">2 Bedroom</option>
+                                <option value="3-bedroom">3 Bedroom</option>
+                                <option value="4-bedroom">4 Bedroom</option>
+                                <option value="5-bedroom">5+ Bedroom</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price ($)</label>
+                            <input type="number" class="form-control" id="price" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="agent" class="form-label">Agent</label>
+                            <input type="text" class="form-control" id="agent">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="status" id="forSale" value="for_sale" checked>
+                                <label class="btn btn-outline-success" for="forSale">For Sale</label>
+                                <input type="radio" class="btn-check" name="status" id="sold" value="sold">
+                                <label class="btn btn-outline-warning" for="sold">Sold</label>
+                            </div>
+                        </div>
+                        <div id="soldDateGroup" class="mb-3" style="display:none;">
+                            <label for="dateSold" class="form-label">Date Sold</label>
+                            <input type="date" class="form-control" id="dateSold">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveProperty">Save Property</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Main Application Script -->
+    <script>
+        // Firebase configuration - REPLACE WITH YOUR ACTUAL CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyDPX5SOMTCXziTnyp8VfxtGp3dWCHP931k",
+            authDomain: "housing-40339.firebaseapp.com",
+            projectId: "housing-40339",
+            storageBucket: "housing-40339.firebasestorage.app",
+            messagingSenderId: "320567801300",
+            appId: "1:320567801300:web:f4d55fa58c97e930991241",
+            measurementId: "G-FFWFD936GW"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Reference to the houses collection
+        const housesRef = db.collection('houses');
+
+        // DOM Elements
+        const propertyForm = document.getElementById('propertyForm');
+        const savePropertyBtn = document.getElementById('saveProperty');
+        const salesTable = document.getElementById('sales-table');
+
+        // Charts
+        let salesChart, statusChart;
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeCharts();
+            loadProperties();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Show/hide sold date field based on status
+            document.querySelectorAll('input[name="status"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    document.getElementById('soldDateGroup').style.display = 
+                        e.target.value === 'sold' ? 'block' : 'none';
+                });
+            });
+
+            // Save property button
+            savePropertyBtn.addEventListener('click', saveProperty);
+        }
+
+        function initializeCharts() {
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            const statusCtx = document.getElementById('statusChart').getContext('2d');
+            
+            salesChart = new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Properties',
+                        data: [],
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+
+            statusChart = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['For Sale', 'Sold'],
+                    datasets: [{
+                        data: [0, 0],
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 159, 64, 0.7)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+        }
+
+        async function loadProperties() {
+            try {
+                const snapshot = await housesRef.orderBy('date_listed', 'desc').get();
+                const properties = [];
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    properties.push({
+                        id: doc.id,
+                        ...data,
+                        date_listed: data.date_listed?.toDate(),
+                        date_sold: data.date_sold?.toDate()
+                    });
+                });
+
+                updateUI(properties);
+            } catch (error) {
+                console.error("Error loading properties:", error);
+                alert("Error loading properties. Check console for details.");
+            }
+        }
+
+        function updateUI(properties) {
+            updatePropertyTable(properties);
+            updateSummaryCards(properties);
+            updateCharts(properties);
+        }
+
+        function updatePropertyTable(properties) {
+            salesTable.innerHTML = '';
+
+            properties.forEach(property => {
+                const row = document.createElement('tr');
+                
+                // Status badge
+                const statusBadge = property.status === 'for_sale'
+                    ? '<span class="badge bg-success status-badge">For Sale</span>'
+                    : `<span class="badge bg-warning status-badge">Sold ${property.date_sold?.toLocaleDateString() || ''}</span>`;
+                
+                // Action button
+                const actionButton = property.status === 'for_sale'
+                    ? `<button class="btn btn-warning btn-sm btn-status" onclick="markAsSold('${property.id}')">Mark Sold</button>`
+                    : '<span class="text-muted">N/A</span>';
+
+                row.innerHTML = `
+                    <td>${property.location}</td>
+                    <td>${property.type}</td>
+                    <td>$${property.price.toLocaleString()}</td>
+                    <td>${property.date_listed.toLocaleDateString()}</td>
+                    <td>${statusBadge}</td>
+                    <td>${actionButton}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="deleteProperty('${property.id}')">
+                            Delete
+                        </button>
+                    </td>
+                `;
+                salesTable.appendChild(row);
+            });
+        }
+
+        function updateSummaryCards(properties) {
+            const now = new Date();
+            const oneWeekAgo = new Date(now);
+            oneWeekAgo.setDate(now.getDate() - 7);
+            
+            const oneMonthAgo = new Date(now);
+            oneMonthAgo.setMonth(now.getMonth() - 1);
+
+            const forSaleCount = properties.filter(p => p.status === 'for_sale').length;
+            const newListings = properties.filter(p => p.date_listed > oneWeekAgo).length;
+            const recentlySold = properties.filter(p => 
+                p.status === 'sold' && p.date_sold > oneMonthAgo
+            ).length;
+
+            document.getElementById('for-sale-count').textContent = forSaleCount;
+            document.getElementById('new-listings').textContent = newListings;
+            document.getElementById('recently-sold').textContent = recentlySold;
+            document.getElementById('total-properties').textContent = properties.length;
+        }
+
+        function updateCharts(properties) {
+            // Update sales chart (group by month)
+            const monthlyData = {};
+            properties.forEach(property => {
+                const monthYear = property.date_listed.getFullYear() + '-' + property.date_listed.getMonth();
+                monthlyData[monthYear] = (monthlyData[monthYear] || 0) + 1;
+            });
+
+            salesChart.data.labels = Object.keys(monthlyData).map(key => {
+                const [year, month] = key.split('-');
+                return new Date(year, month).toLocaleString('default', { month: 'short', year: 'numeric' });
+            });
+            salesChart.data.datasets[0].data = Object.values(monthlyData);
+            salesChart.update();
+
+            // Update status chart
+            const forSaleCount = properties.filter(p => p.status === 'for_sale').length;
+            const soldCount = properties.filter(p => p.status === 'sold').length;
+            
+            statusChart.data.datasets[0].data = [forSaleCount, soldCount];
+            statusChart.update();
+        }
+
+        async function saveProperty() {
+            const status = document.querySelector('input[name="status"]:checked').value;
+            
+            const property = {
+                location: document.getElementById('location').value.trim(),
+                type: document.getElementById('type').value,
+                price: Number(document.getElementById('price').value),
+                status: status,
+                date_listed: new Date(),
+                agent: document.getElementById('agent').value || 'Unassigned'
+            };
+
+            if (status === 'sold') {
+                const soldDate = document.getElementById('dateSold').value;
+                property.date_sold = soldDate ? new Date(soldDate) : new Date();
+            }
+
+            try {
+                await housesRef.add(property);
+                alert("Property saved successfully!");
+                propertyForm.reset();
+                document.getElementById('soldDateGroup').style.display = 'none';
+                bootstrap.Modal.getInstance(document.getElementById('addPropertyModal')).hide();
+                loadProperties();
+            } catch (error) {
+                console.error("Error saving property:", error);
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        async function markAsSold(propertyId) {
+            const soldDate = prompt("Enter sale date (YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
+            
+            if (!soldDate) return;
+
+            try {
+                await housesRef.doc(propertyId).update({
+                    status: "sold",
+                    date_sold: new Date(soldDate)
+                });
+                loadProperties();
+            } catch (error) {
+                alert("Error updating property: " + error.message);
+            }
+        }
+
+        async function deleteProperty(propertyId) {
+            if (confirm("Are you sure you want to delete this property?")) {
+                try {
+                    await housesRef.doc(propertyId).delete();
+                    loadProperties();
+                } catch (error) {
+                    alert("Error deleting property: " + error.message);
+                }
+            }
+        }
+
+        // Make functions available globally for HTML onclick attributes
+        window.markAsSold = markAsSold;
+        window.deleteProperty = deleteProperty;
+    </script>
+</body>
+</html>

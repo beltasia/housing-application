@@ -1,9 +1,7 @@
 # housing-application
 # 🏠 House Sales Tracker - Bulawayo
 
-A web-based dashboard to track and visualize house sales data in Bulawayo using Firebase and React.
-
-![Project Screenshot](https://via.placeholder.com/800x400?text=House+Sales+Tracker+Screenshot)
+A web-based dashboard to track and visualize house sales data in Bulawayo using Firebase and Reac
 
 ## 🔥 Features
 
@@ -64,17 +62,30 @@ npm start
 ## 📂 Project Structure
 
 ```
-src/
-├── components/      # React components
-│   ├── Charts/      # Data visualization components
-│   ├── Forms/       # Input forms
-│   └── UI/          # Reusable UI elements
-├── firebase/        # Firebase configuration
-├── hooks/           # Custom React hooks
-├── pages/           # Application pages
-├── utils/           # Utility functions
-├── App.js           # Main application component
-└── index.js         # Entry point
+bulawayo-housing-app/
+├── public/                      # Static files
+│   
+│   
+│   │   └── ...
+│   └── index.html               # Main HTML file
+│
+├── src/
+│   ├── js/
+│   │   ├── app.js               # Main application logic
+│   │   ├── chartcomponent.js    # Chart handling
+│   │   ├── firebase.js          # Firebase config
+│   │   └── auth.js              # Authentication (optional)
+│   │
+│   ├── css/
+│   │   └── styles.css           # Custom styles
+│   │
+│   └── utils/
+│       ├── helpers.js           # Utility functions
+│       └── validators.js        # Form validation
+│
+├── firebase.json               # Firebase config
+├── .firebaserc                 # Firebase project settings
+└── README.md                   # Project documentation
 ```
 
 ## 🔧 Available Scripts

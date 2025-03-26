@@ -2,13 +2,12 @@ import { initializeCharts, updateCharts } from './chartcomponent.js';
 
 // Firebase Configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDPX5SOMTCXziTnyp8VfxtGp3dWCHP931k",
-  authDomain: "housing-40339.firebaseapp.com",
-  projectId: "housing-40339",
-  storageBucket: "housing-40339.firebasestorage.app",
-  messagingSenderId: "320567801300",
-  appId: "1:320567801300:web:f4d55fa58c97e930991241",
-  measurementId: "G-FFWFD936GW"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_BUCKET.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 // Initialize Firebase

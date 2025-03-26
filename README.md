@@ -9,7 +9,7 @@ A web-based dashboard to track and visualize house sales data in Bulawayo using 
 
 - **Real-time data visualization** of house sales
 - **Firebase Firestore** database integration
-- **Interactive charts** using Chart.js
+- **Interactive charts** using chartcomponent.js
 - **Responsive design** works on all devices
 - **CRUD operations** for managing house listings
 
